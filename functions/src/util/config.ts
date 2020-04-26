@@ -1,10 +1,10 @@
 export const config = {
-  apiKey: 'AIzaSyC429QGf29OpHRZDXmyDdpUJDQfbJkJX5M',
-  authDomain: 'tododder-c997e.firebaseapp.com',
-  databaseURL: 'https://tododder-c997e.firebaseio.com',
-  projectId: 'tododder-c997e',
-  storageBucket: 'tododder-c997e.appspot.com',
-  messagingSenderId: '1000422616169',
-  appId: '1:1000422616169:web:855349977fd67041e106f8',
-  measurementId: 'G-SJR14HMC4B',
+  apiKey: "AIzaSyDoyjqvBuuHWIyVo4VZVXr8Rbcgjx3V6ns",
+  authDomain: "habits-machine.firebaseapp.com",
+  databaseURL: "https://habits-machine.firebaseio.com",
+  projectId: "habits-machine",
+  storageBucket: "habits-machine.appspot.com",
+  messagingSenderId: "395805636449",
+  appId: "1:395805636449:web:7b587d59b93d1d88b0f720",
+  measurementId: "G-XC87H14HKG"
 };

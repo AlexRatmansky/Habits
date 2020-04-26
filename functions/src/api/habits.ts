@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import { db } from '../util/admin';
 
-interface Todo {
-  todoId: string;
+interface Habit {
+  habitId: string;
   title: string;
   body: string;
   createdAt: string;
   username: string;
 }
 
-type Todos = Array<Todo>;
+type Habits = Array<Habit>;
 
 interface UserRequest extends Request {
   user: {
@@ -17,17 +17,17 @@ interface UserRequest extends Request {
   };
 }
 
-export const getAllTodos = (request: UserRequest, response: Response) => {
-  db.collection('todos')
+export const getAllHabits = (request: UserRequest, response: Response) => {
+  db.collection('habits')
     .where('username', '==', request.user.username)
     .orderBy('createdAt', 'desc')
     .get()
     .then(data => {
-      const todos: Todos = [];
+      const habits: Habits = [];
 
       data.forEach(doc => {
-        todos.push({
-          todoId: doc.id,
+        habits.push({
+          habitId: doc.id,
           title: doc.data().title,
           username: doc.data().username,
           body: doc.data().body,
@@ -35,7 +35,7 @@ export const getAllTodos = (request: UserRequest, response: Response) => {
         });
       });
 
-      return response.json(todos);
+      return response.json(habits);
     })
     .catch(err => {
       console.error(err);
@@ -43,21 +43,21 @@ export const getAllTodos = (request: UserRequest, response: Response) => {
     });
 };
 
-export const getOneTodo = (request: UserRequest, response: Response) => {
-  db.doc(`/todos/${request.params.todoId}`)
+export const getOneHabit = (request: UserRequest, response: Response) => {
+  db.doc(`/habits/${request.params.habitId}`)
     .get()
     .then(doc => {
       if (!doc.exists) {
         return response.status(404).json({
-          error: 'Todo not found',
+          error: 'Habit not found',
         });
       }
       if (doc.data().username !== request.user.username) {
         return response.status(403).json({ error: 'UnAuthorized' });
       }
-      const TodoData = doc.data();
-      TodoData.todoId = doc.id;
-      return response.json(TodoData);
+      const HabitData = doc.data();
+      HabitData.habitId = doc.id;
+      return response.json(HabitData);
     })
     .catch(error => {
       console.error(error);
@@ -65,7 +65,7 @@ export const getOneTodo = (request: UserRequest, response: Response) => {
     });
 };
 
-export const postOneTodo = (request: UserRequest, response: Response) => {
+export const postOneHabit = (request: UserRequest, response: Response) => {
   if (request.body.body.trim() === '') {
     return response.status(400).json({ body: 'Must not be empty' });
   }
@@ -74,7 +74,7 @@ export const postOneTodo = (request: UserRequest, response: Response) => {
     return response.status(400).json({ title: 'Must not be empty' });
   }
 
-  const newTodoItem = {
+  const newHabitItem = {
     id: '',
     title: request.body.title,
     body: request.body.body,
@@ -82,12 +82,12 @@ export const postOneTodo = (request: UserRequest, response: Response) => {
     username: request.user.username,
   };
 
-  db.collection('todos')
-    .add(newTodoItem)
+  db.collection('habits')
+    .add(newHabitItem)
     .then(doc => {
-      const responseTodoItem = newTodoItem;
-      responseTodoItem.id = doc.id;
-      return response.json(responseTodoItem);
+      const responseHabitItem = newHabitItem;
+      responseHabitItem.id = doc.id;
+      return response.json(responseHabitItem);
     })
     .catch(err => {
       console.error(err);
@@ -95,21 +95,21 @@ export const postOneTodo = (request: UserRequest, response: Response) => {
     });
 };
 
-export const deleteTodo = async (request: UserRequest, response: Response) => {
+export const deleteHabit = async (request: UserRequest, response: Response) => {
   try {
-    const todo = await db.collection('todos').doc(request.params.todoId);
+    const habit = await db.collection('habits').doc(request.params.habitId);
 
-    const todoDoc = await todo.get();
+    const habitDoc = await habit.get();
 
-    if (!todoDoc.exists) {
-      return response.status(404).json({ error: 'Todo not found' });
+    if (!habitDoc.exists) {
+      return response.status(404).json({ error: 'Habit not found' });
     }
 
-    if (todoDoc.data().username !== request.user.username) {
+    if (habitDoc.data().username !== request.user.username) {
       return response.status(403).json({ error: 'UnAuthorized' });
     }
 
-    await todo.delete();
+    await habit.delete();
 
     return response.json({ message: 'Delete successful' });
   } catch (error) {
@@ -118,14 +118,14 @@ export const deleteTodo = async (request: UserRequest, response: Response) => {
   }
 };
 
-export const editTodo = (request: Request, response: Response) => {
-  if (request.body.todoId || request.body.createdAt) {
+export const editHabit = (request: Request, response: Response) => {
+  if (request.body.habitId || request.body.createdAt) {
     response.status(403).json({ message: 'Not allowed to edit' });
   }
 
-  const todo = db.collection('todos').doc(request.params.todoId);
+  const habit = db.collection('habits').doc(request.params.habitId);
 
-  todo
+  habit
     .update(request.body)
     .then(() => {
       response.json({ message: 'Updated successfully' });
